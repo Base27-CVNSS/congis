@@ -1,0 +1,21 @@
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+import {Script} from "node:vm";
+
+const js=readFileSync("app.js","utf8");
+const html=readFileSync("index.html","utf8");
+const css=readFileSync("style.css","utf8");
+new Script(js,{filename:"app.js"});
+const ids=[...new Set([...js.matchAll(/byId\("([^"]+)"\)/g)].map(x=>x[1]))];
+const missing=ids.filter(id=>!html.includes('id="'+id+'"'));
+assert.deepEqual(missing,[],"JavaScript references missing DOM IDs");
+assert.match(html,/maplibre-gl/,"MapLibre GL library");
+assert.match(html,/<canvas id="erosion-chart"/,"Erosion chart");
+assert.match(html,/<canvas id="biodiversity-chart"/,"Species chart");
+assert.match(js,/495/,"Research species total");
+assert.match(js,/erosion:2/,"Phú Đa reported erosion");
+assert.match(js,/escapeFormulae:true/,"CSV formula injection mitigation");
+assert.match(js,/data_status:"place-reference-only"/,"Explicit schematic geo provenance");
+assert.match(css,/@media\(max-width:700px\)/,"Mobile layout");
+assert.match(readFileSync("README.md","utf8"),/cần dữ liệu gốc/i,"Research reimplementation limitations");
+console.log("PASS congis smoke checks; DOM references:",ids.length);
