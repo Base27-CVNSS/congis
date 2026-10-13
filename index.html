@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0a2533">
+  <meta name="description" content="Cồn GIS — Atlas nghiên cứu bãi bồi, cồn nổi ven sông Bến Tre. WebGIS khoa học tái lập báo cáo Viện Kỹ thuật Biển.">
+  <title>Cồn GIS — River Islands Research Atlas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="identity">
+        <div class="brand-mark" aria-hidden="true"><span class="brand-waves">≋</span><span class="brand-orbit"></span></div>
+        <div><div class="brand-heading">CỒN<span>GIS</span> <small>RESEARCH ATLAS</small></div><div class="brand-sub">River Islands &amp; Sediment Dynamics · Bến Tre</div></div>
+      </div>
+      <nav class="toplinks" aria-label="Điều hướng">
+        <a href="#ban-do" class="nav-active">Bản đồ</a><a href="#ket-qua">Kết quả nghiên cứu</a><a href="#phuong-phap">Phương pháp</a>
+      </nav>
+      <div class="header-actions">
+        <span class="provenance-pill"><span class="status-dot"></span> TÁI LẬP TỪ BÁO CÁO</span>
+        <a class="github-link" href="https://github.com/Base27-CVNSS/congis" target="_blank" rel="noopener noreferrer" aria-label="Mã nguồn GitHub">↗ <span>GitHub</span></a>
+      </div>
+    </header>
+
+    <section class="intro-strip" aria-label="Chỉ số nghiên cứu">
+      <div class="intro-copy"><div class="eyebrow">TRUNG TÂM DỮ LIỆU KHÔNG GIAN · BẾN TRE</div><h1>Bản đồ nghiên cứu <em>bãi bồi &amp; cồn nổi ven sông</em></h1><p>Tái hiện các thành phần WebGIS của đề tài, kết hợp truy vấn không gian và bằng chứng khoa học đã công bố.</p></div>
+      <div class="key-figures">
+        <div class="figure"><strong>10</strong><span>Khu vực chính</span></div>
+        <div class="figure"><strong>15</strong><span>Bãi bồi / cồn nổi</span></div>
+        <div class="figure"><strong>495</strong><span>Loài sinh vật</span></div>
+      </div>
+    </section>
+
+    <div class="workspace" id="ban-do">
+      <aside class="sidebar" aria-label="Khám phá khu vực">
+        <div class="sidebar-heading"><div><span class="micro">GEOSPATIAL EXPLORER</span><h2>Khu vực nghiên cứu</h2></div><span class="count-chip">08 vùng chọn</span></div>
+        <label class="search-wrap"><span aria-hidden="true">⌕</span><input type="search" id="site-search" placeholder="Tìm cồn, sông, khu vực..." autocomplete="off"><kbd>⌕</kbd></label>
+        <div class="side-filter" id="risk-filter" role="group" aria-label="Lọc theo diễn biến"><button class="filter active" data-risk="all">Tất cả</button><button class="filter" data-risk="erosion">Xói lở</button><button class="filter" data-risk="stable">Ổn định / bồi</button></div>
+        <div class="list-caption"><span>DANH MỤC TỪ BÁO CÁO</span><span id="site-count">08 khu vực</span></div>
+        <div id="site-list" class="site-list"></div>
+        <div class="sidebar-foot"><strong>Phạm vi dữ liệu</strong><p>Điểm định vị trên bản đồ chỉ là vị trí địa danh <b>ước lượng phục vụ điều hướng</b>, không phải mốc khảo sát gốc. Nhập ranh giới GeoJSON để phân tích hình học chính xác.</p><button id="show-provenance" class="text-action">Xem mức độ tái lập &amp; nguồn số liệu →</button></div>
+      </aside>
+
+      <main class="map-panel" aria-label="WebGIS tương tác">
+        <div class="map-heading">
+          <div><span class="micro">SPATIAL INTELLIGENCE / INTERACTIVE MAP</span><h2>Không gian sông ngòi Bến Tre</h2></div>
+          <div class="map-heading-controls"><span id="map-status" class="map-ready">Đang tải bản đồ…</span><button class="subtle-btn" id="reset-view" title="Về vùng nghiên cứu">◎ Về Bến Tre</button></div>
+        </div>
+        <div class="map-stage">
+          <div id="map" aria-label="Bản đồ tương tác khu vực Bến Tre"></div>
+          <div class="map-toolbar" aria-label="Công cụ bản đồ">
+            <button id="tool-identify" class="tool-button active" title="Truy vấn đối tượng" aria-label="Truy vấn đối tượng">⌖</button>
+            <button id="tool-distance" class="tool-button" title="Đo khoảng cách: nhấp các điểm, nhấp đúp để kết thúc" aria-label="Đo khoảng cách">↗</button>
+            <button id="tool-area" class="tool-button" title="Đo diện tích: nhấp các đỉnh, nhấp đúp để kết thúc" aria-label="Đo diện tích">⬡</button>
+            <div class="tool-divider"></div>
+            <button id="tool-upload" class="tool-button" title="Tải dữ liệu GeoJSON hoặc CSV" aria-label="Tải GeoJSON hoặc CSV">＋</button>
+            <button id="tool-fullscreen" class="tool-button" title="Toàn màn hình" aria-label="Toàn màn hình">⤢</button>
+          </div>
+          <div class="map-switcher" role="group" aria-label="Bản đồ nền"><button id="basemap-light" class="active">Bản đồ sáng</button><button id="basemap-sat">Vệ tinh</button></div>
+          <div class="map-legend" id="map-legend"><div class="legend-title">CHÚ GIẢI DIỄN BIẾN <button id="toggle-legend" aria-label="Thu gọn chú giải">⌄</button></div><div id="legend-content"><div><i class="key risk-high"></i> Có xu hướng xói lở mạnh</div><div><i class="key risk-stable"></i> Bồi tụ hoặc tương đối ổn định</div><div><i class="key risk-watch"></i> Theo dõi / chưa định lượng</div><small>Điểm ký hiệu là tham chiếu địa danh, không phải ranh giới khảo sát.</small></div></div>
+          <div class="map-help" id="measure-help" hidden><b id="measure-title">Công cụ đo</b><span id="measure-description">Nhấp bản đồ để thêm điểm · nhấp đúp để kết thúc</span><button id="measure-clear">Xóa</button></div>
+          <div class="map-coordinates"><span id="mouse-coordinates">WGS84 · 10.2400°N, 106.3900°E</span><span class="coord-sep">|</span><span id="map-zoom">Z 9.0</span></div>
+        </div>
+      </main>
+
+      <aside class="inspector" aria-label="Quản lý và thông tin lớp">
+        <div class="inspector-top"><span class="micro">DATA LAYERS / OGC SERVICES</span><h2>Quản lý lớp</h2><p>Bật/tắt, chồng lớp và truy vấn dữ liệu không gian.</p></div>
+        <div class="inspector-group"><label class="layer-row"><span class="layer-name"><i class="layer-icon points"></i><span>Địa danh nghiên cứu<small>Danh mục tham chiếu</small></span></span><input id="toggle-sites" type="checkbox" checked><span class="switch"></span></label><label class="layer-row"><span class="layer-name"><i class="layer-icon imported"></i><span>Dữ liệu nhập vào<small id="import-layer-caption">Chưa tải lớp</small></span></span><input id="toggle-imported" type="checkbox" checked><span class="switch"></span></label><label class="layer-row"><span class="layer-name"><i class="layer-icon service"></i><span>GeoServer WMS<small id="wms-caption">Chưa kết nối</small></span></span><input id="toggle-wms" type="checkbox" checked><span class="switch"></span></label></div>
+        <div class="inspector-group"><div class="group-header">TẢI DỮ LIỆU</div><button id="upload-data" class="primary-button">＋ Nhập GeoJSON / CSV</button><input type="file" id="file-input" accept=".geojson,.json,.csv,application/geo+json,text/csv" hidden><p class="fineprint" id="import-message">Hỗ trợ EPSG:4326 (WGS84), tính toán trong trình duyệt.</p><div class="small-actions"><button id="export-geojson">↓ GeoJSON</button><button id="export-csv">↓ CSV</button></div></div>
+        <div class="inspector-group"><div class="group-header">KẾT NỐI OGC WMS</div><label class="field-label" for="wms-url">URL GeoServer</label><input class="field" id="wms-url" type="url" placeholder="https://server/geoserver/wms"><label class="field-label" for="wms-layer">Tên lớp (workspace:layer)</label><input class="field" id="wms-layer" type="text" placeholder="workspace:layer"><button class="outline-button" id="connect-wms">Kết nối lớp WMS →</button><p id="wms-message" class="fineprint">Yêu cầu WMS hỗ trợ EPSG:3857 và truy cập từ trình duyệt.</p></div>
+        <div class="inspector-group details-section"><div class="group-header">THÔNG TIN ĐỐI TƯỢNG</div><div id="feature-details" class="feature-details"><div class="empty-icon">◎</div><b>Chưa chọn đối tượng</b><p>Nhấp một vị trí trên bản đồ hoặc danh mục bên trái để xem thông tin.</p></div></div>
+      </aside>
+    </div>
+
+    <section class="results" id="ket-qua">
+      <div class="results-heading"><div><span class="micro">RESEARCH EVIDENCE · PUBLISHED FINDINGS</span><h2>Kết quả nghiên cứu định lượng</h2><p>Các giá trị bên dưới trích từ phần kết luận báo cáo, không phải quan trắc thời gian thực hay mô phỏng mới.</p></div><span class="reference-chip">NGUỒN: BÁO CÁO TR. 251–253</span></div>
+      <div class="evidence-kpis"><div class="evidence-kpi"><div>VẬN TỐC DÒNG CHẢY</div><strong>≈ 2 <small>m/s</small></strong><p>Tối đa gần đúng · khu vực Phú Đa</p></div><div class="evidence-kpi"><div>XÓI LỞ ƯỚC TÍNH</div><strong>2 <small>m/năm</small></strong><p>Mức có thể xảy ra · khu vực Phú Đa</p></div><div class="evidence-kpi"><div>KHẢO SÁT THỦY VĂN</div><strong>2 <small>trạm</small></strong><p>Sông Mỹ Tho &amp; sông Cổ Chiên</p></div><div class="evidence-kpi"><div>ĐA DẠNG SINH HỌC</div><strong>495 <small>loài</small></strong><p>Ghi nhận trên toàn vùng nghiên cứu</p></div></div>
+      <div class="charts-grid"><article class="chart-card"><div class="chart-heading"><div><h3>Xói lở lớn nhất có thể xảy ra</h3><p>m/năm · các khu vực được định lượng trong kết luận</p></div><span class="data-tag">MÔ HÌNH TRONG BÁO CÁO</span></div><div class="chart-container"><canvas id="erosion-chart"></canvas></div><p class="chart-note">Không biểu diễn số liệu vị trí khác khi báo cáo không cung cấp trị số tương đương trong phần kết luận.</p></article><article class="chart-card"><div class="chart-heading"><div><h3>Thành phần đa dạng sinh học</h3><p>Số loài khảo sát, tổng 495 loài</p></div><span class="data-tag">KẾT QUẢ KHẢO SÁT</span></div><div class="biodiversity-wrap"><div class="donut-container"><canvas id="biodiversity-chart"></canvas></div><div id="biodiversity-legend" class="biodiversity-legend"></div></div></article></div>
+      <div class="research-note"><span>ⓘ</span><p><b>Ranh giới giữa kết quả và minh họa:</b> số liệu trích báo cáo có nguồn; ký hiệu địa danh trên WebGIS là vị trí gợi ý. Muốn tính diện tích cồn, tốc độ dịch chuyển đường bờ hay tái chạy mô hình 2030 phải có dữ liệu không gian gốc và tham số mô hình.</p></div>
+    </section>
+
+    <section class="method" id="phuong-phap"><div><span class="micro">SCIENTIFIC REPRODUCIBILITY</span><h2>Kiến trúc tái lập</h2><p>Giao diện WebGIS chạy tĩnh trên GitHub Pages; lớp GIS gốc có thể kết nối qua GeoServer WMS hoặc dữ liệu GeoJSON/CSV. Tương thích với quy trình biên tập QGIS và xuất bản OGC trong nghiên cứu.</p></div><div class="method-flow"><span>QGIS / SHP / GeoJSON</span><b>→</b><span>GeoServer · WMS</span><b>→</b><span>CồnGIS WebGIS</span><b>→</b><span>Truy vấn · Phân tích</span></div></section>
+    <footer class="site-footer"><span>© 2026 Long Ngo · Vietflexmap · Code MIT</span><span>Nghiên cứu gốc: Viện Kỹ thuật Biển · Dữ liệu demo được phân biệt với dữ liệu nghiên cứu</span><a href="https://github.com/Base27-CVNSS/congis" target="_blank" rel="noopener noreferrer">Source ↗</a></footer>
+  </div>
+
+  <dialog id="source-dialog" class="source-dialog"><div class="dialog-top"><div><span class="micro">DATA PROVENANCE</span><h2>Độ tin cậy &amp; tái lập</h2></div><button id="close-source" aria-label="Đóng">×</button></div><p><b>Tài liệu khoa học:</b> 2025BTE_BCTH_Connoivensong.pdf — “Điều tra thực trạng, đánh giá chế độ dòng chảy, xu thế diễn biến các bãi bồi, cồn nổi ven sông và đề xuất giải pháp khai thác tổng hợp”, Viện Kỹ thuật Biển.</p><div class="provenance-row"><span class="provenance-tag verified">ĐÃ TRÍCH TỪ BÁO CÁO</span><div>10 khu vực chính, 15 bãi bồi/cồn nổi, 495 loài, các chỉ số Phú Đa, cồn Lác, Tiên Lợi. Đối chiếu tr. 251–253.</div></div><div class="provenance-row"><span class="provenance-tag rebuilt">ĐÃ TÁI LẬP</span><div>Quản lý lớp, bản đồ, đo đạc, tìm kiếm, thông tin thuộc tính, import/export, kết nối WMS. Đối chiếu mô tả hệ thống tr. 201–210.</div></div><div class="provenance-row"><span class="provenance-tag pending">CHƯA CÓ DỮ LIỆU</span><div>Vị trí khảo sát chính xác, polygon bãi bồi, đường bờ đa thời gian, DEM, dữ liệu mô hình vận chuyển bùn cát, raster dự báo 2030.</div></div><button class="primary-button" id="ack-source">Đã hiểu</button></dialog>
+
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.5.2/papaparse.min.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
