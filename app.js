@@ -44,6 +44,7 @@ function makeMap(){
   });
   map.on("mousemove",e=>{byId("mouse-coordinates").textContent="WGS84 · "+e.lngLat.lat.toFixed(5)+"°N, "+e.lngLat.lng.toFixed(5)+"°E";});
   map.on("zoom",updateZoom);
+  map.on("load",initOverview);
   map.on("click",e=>{if(state.mode!=="identify")addMeasurePoint([e.lngLat.lng,e.lngLat.lat]);});
   map.on("dblclick",e=>{if(state.mode!=="identify"){e.preventDefault();finishMeasure();}});
   ["sites-circle","import-points","import-fill","import-lines"].forEach(id=>{
@@ -70,6 +71,24 @@ function setupLayers(){
   map.addLayer({id:"measure-vertices",type:"circle",source:"measure-geojson",filter:["==",["geometry-type"],"Point"],paint:{"circle-radius":4,"circle-color":"#0c847b","circle-stroke-width":2,"circle-stroke-color":"white"}});
   if(state.wms)attachWms();
   if(state.measurePoints.length)renderMeasurement();
+}
+function initOverview(){
+ if(state.overview||!state.map)return;
+ const style={version:8,sources:{overviewBase:{type:"raster",tiles:LIGHT_TILES,tileSize:256}},layers:[{id:"overview-base",type:"raster",source:"overviewBase"}]};
+ const mini=new maplibregl.Map({container:"overview-map",style,center:[106.36,10.26],zoom:7.35,interactive:false,attributionControl:false,fadeDuration:0});
+ state.overview=mini;
+ mini.on("style.load",()=>{
+  mini.addSource("overview-extent",{type:"geojson",data:EMPTY});
+  mini.addLayer({id:"overview-box",type:"fill",source:"overview-extent",paint:{"fill-color":"#16a995","fill-opacity":.15}});
+  mini.addLayer({id:"overview-outline",type:"line",source:"overview-extent",paint:{"line-color":"#087e74","line-width":2}});
+  updateOverview();
+ });
+ state.map.on("move",updateOverview);
+}
+function updateOverview(){
+ if(!state.overview?.getSource("overview-extent")||!state.map)return;
+ const b=state.map.getBounds(),w=b.getWest(),e=b.getEast(),s=b.getSouth(),n=b.getNorth();
+ state.overview.getSource("overview-extent").setData({type:"Feature",properties:{},geometry:{type:"Polygon",coordinates:[[[w,s],[e,s],[e,n],[w,n],[w,s]]]}});
 }
 function updateZoom(){if(state.map)byId("map-zoom").textContent="Z "+state.map.getZoom().toFixed(1);}
 function setBasemap(kind){if(!state.map||kind===state.basemap)return;state.basemap=kind;byId("basemap-light").classList.toggle("active",kind==="light");byId("basemap-sat").classList.toggle("active",kind==="sat");state.ready=false;state.map.setStyle(mapStyle());}
