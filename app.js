@@ -29,7 +29,7 @@ const EMPTY = {type:"FeatureCollection",features:[]};
 const PROVENANCE = "Điểm địa danh ước lượng chỉ phục vụ định hướng; không phải tọa độ khảo sát.";
 function escapeHTML(v){return String(v===null||v===undefined?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function siteFeatures(){return {type:"FeatureCollection",features:SITES.map(s=>({type:"Feature",id:s.id,properties:{id:s.id,name:s.name,risk:s.risk,river:s.river,data_status:"place-reference-only",location_precision:"approximate"},geometry:{type:"Point",coordinates:[s.lon,s.lat]}}))};}
-function mapStyle(){return {version:8, name:"Cồn GIS atlas",sources:{basemap:{type:"raster",tiles:state.basemap==="light"?LIGHT_TILES:SAT_TILES,tileSize:256,attribution:state.basemap==="light"?"© OpenStreetMap contributors · © CARTO":"Imagery © Esri and contributors"}},layers:[{id:"basemap-layer",type:"raster",source:"basemap"}]};}
+function mapStyle(){return {version:8, name:"Cồn GIS atlas",glyphs:"https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",sources:{basemap:{type:"raster",tiles:state.basemap==="light"?LIGHT_TILES:SAT_TILES,tileSize:256,attribution:state.basemap==="light"?"© OpenStreetMap contributors · © CARTO":"Imagery © Esri and contributors"}},layers:[{id:"basemap-layer",type:"raster",source:"basemap"}]};}
 function reportStatus(msg, kind){const el=byId("map-status");el.textContent=msg;el.classList.toggle("error",kind==="error");}
 function setNotice(id,msg,kind){const el=byId(id);el.textContent=msg;el.classList.remove("success","error");if(kind)el.classList.add(kind);}
 function isLayer(id){return state.ready&&!!state.map.getLayer(id);}
