@@ -141,7 +141,7 @@ function downloadFile(name,body,mime){
 }
 function getExportData(){return state.imported.features.length?state.imported:siteFeatures();}
 function exportGeoJSON(){const obj=getExportData();downloadFile(state.imported.features.length?"congis-user-data.geojson":"congis-place-references-approximate.geojson",JSON.stringify(obj,null,2),"application/geo+json");}
-function toCsv(rows){if(typeof Papa!=="undefined")return Papa.unparse(rows);const quote=x=>'"'+String(x??"").replace(/"/g,'""')+'"';return rows.map(row=>row.map(quote).join(",")).join("\r\n");}
+function toCsv(rows){if(typeof Papa!=="undefined")return Papa.unparse(rows,{escapeFormulae:true});const quote=x=>'"'+String(x??"").replace(/"/g,'""')+'"';return rows.map(row=>row.map(quote).join(",")).join("\r\n");}
 function exportCSV(){
  let rows;
  if(state.imported.features.length){const keys=[...new Set(state.imported.features.flatMap(f=>Object.keys(f.properties||{})))];rows=[["longitude","latitude",...keys],...state.imported.features.map(f=>{const coords=f.geometry.type==="Point"?f.geometry.coordinates:[null,null];return [coords[0],coords[1],...keys.map(k=>f.properties?.[k]??"")];})];}
